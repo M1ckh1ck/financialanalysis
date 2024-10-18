@@ -11,6 +11,10 @@ while another_calculation:
     
     print(f"The present value of your bond is {bond_pv:.4f}")
 
+    duration_calc = input("Would you like calculate the Macualay Duration? y/n ")
+    if duration_calc == "y":
+        calc_mac_duration()
+
     another = input("Would you like another calculation y/n? ").lower()
     if another == 'n':
         break
