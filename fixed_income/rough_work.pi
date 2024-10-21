@@ -1,0 +1,55 @@
+def pv_bond(coupon, number_of_periods, market_rate, face_value, days_since_last_coupon, days_in_the_period):
+    """Calculate the present value of the bond including days since last coupon payment"""
+    pv_principal = face_value / ((1 + market_rate) ** number_of_periods)
+
+    pv_coupons = sum(coupon / ((1 + market_rate) ** i) for i in range(1, number_of_periods + 1))
+
+    total_pv = (pv_coupons + pv_principal) * ((1 + market_rate) ** (days_since_last_coupon / days_in_the_period))
+    return total_pv
+
+def calculate_bond_pv_with_rate_change(coupon, number_of_periods, market_rate, face_value, 
+                                       days_since_last_coupon, days_in_the_period, rate_change=0):
+    """Calculate the present value of the bond with an optional rate change"""
+    adjusted_rate = market_rate + rate_change
+    return pv_bond(coupon, number_of_periods, adjusted_rate, face_value, 
+                   days_since_last_coupon, days_in_the_period)
+
+# Inputs for the present value calculation
+face_value = float(input("What is the par value of the bond? "))
+
+# Calculate the coupon per period
+coupon_rate = float(input("How much is the coupon in bps? "))
+period = input("Is the coupon paid quarterly, semi-annually, or annually? (q/s/a) ").lower()
+
+# Determine the number of periods based on the input
+period_dict = {"q": 4, "s": 2, "a": 1}
+period = period_dict.get(period, 1)
+
+coupon = ((coupon_rate / 10000) * face_value) / period
+
+# Calculate the market rate (YTM) and rate change in bps
+market_rate = float(input("What is the current market rate in bps? ")) / 10000 / period
+rate_change = float(input("What is the change in market rate in bps? ")) / 10000 / period
+
+# Calculate the number of periods
+number_of_years = int(input("What is the number of years? "))
+number_of_periods = number_of_years * period
+
+# Days since last coupon and total days in the period
+days_since_last_coupon = int(input("How many days since last coupon payment? "))
+days_in_the_period = int(input("How many days in the period? "))
+
+# Calculate present values with and without rate changes
+current_pv_bond = pv_bond(coupon, number_of_periods, market_rate, face_value, 
+                          days_since_last_coupon, days_in_the_period)
+
+up_pv_bond = calculate_bond_pv_with_rate_change(coupon, number_of_periods, market_rate, face_value, 
+                                                days_since_last_coupon, days_in_the_period, rate_change)
+
+down_pv_bond = calculate_bond_pv_with_rate_change(coupon, number_of_periods, market_rate, face_value, 
+                                                  days_since_last_coupon, days_in_the_period, -rate_change)
+
+# Calculate approximate modified duration
+approx_mod_duration = (down_pv_bond - up_pv_bond) / (2 * rate_change * current_pv_bond)
+
+print(f"The current PV of the bond is {current_pv_bond:.2f} and the approximate modified duration is {approx_mod_duration:.2f} years.")
