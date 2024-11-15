@@ -1,14 +1,25 @@
 import pandas as pd
+import numpy as np
+import yfinance as yf
+import matplotlib.pyplot as plt
 
-mcd_data = pd.read_csv("finance_projects/financialanalysis/portfolio_analysis/mcd_data.csv")
+portfolio = []
 
-max_close = mcd_data["Adj Close"].max()
+def create_portfolio():
+    portfolio = []
+    another_ticker = True
+    while another_ticker:
+        ticker = input("What is the ticker symbol? Type quit to finish: ").lower()
+        if ticker == "quit":
+            break
+        portfolio.append(ticker)
+    return portfolio
 
-#Calculate simple moving averages
-moving_10_avg = mcd_data["Adj Close"].tail(10).mean()
-moving_20_avg = mcd_data["Adj Close"].tail(20).mean()
-moving_30_avg = mcd_data["Adj Close"].tail(30).mean()
+weights = []
+for ticker in range(len(portfolio)):
+    weight = float(input("What is the weight of the holding in decimals? "))
+    weights.append(weight)
 
-print(f"Moving average for 10 days is {moving_10_avg: .4f}, 20 days is {moving_20_avg: .4f}, 30 days is {moving_30_avg: .4f}")
+print(weights)
 
-#Future calcultaion exponential moving average, relative strentgth index, Stochastic Oscillator, Volume
+create_portfolio()

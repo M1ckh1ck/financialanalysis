@@ -19,12 +19,11 @@ class Equity:
     def download_historical_data(self, period= None, start= None, end= None, interval="1d"):
         """Download historical entering start and end date, interval set to 1 d as default"""
 
-        interval = input("Enter interval 1mo, 1wk, 1d or 1h: ")
         date_range = input("Enter d for date range or p for period: ")
 
         if date_range.lower() == "p":
             period = input("Enter the period 1mo, 3mo, 1y, 5y, max: ")
-            self.historical_data = self.ticker.history(period= period, interval= interval)
+            self.historical_data = self.ticker.history(period= period)
             return self.historical_data
         
         else:
@@ -32,5 +31,5 @@ class Equity:
             start_date = datetime.strptime(start, "%Y/%m/%d").strftime("%Y-%m-%d")
             end = input("What is the end date? YYYY/MM/DD: ")
             end_date = datetime.strptime(end, "%Y/%m/%d").strftime("%Y-%m-%d")
-            self.historical_data = self.ticker.history(start= start, end= end, interval= interval)
+            self.historical_data = self.ticker.history(start= start, end= end)
             return self.historical_data
