@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import yfinance as yf
+
 import matplotlib.pyplot as plt
 from scipy.stats import norm
 from scipy import stats
@@ -12,7 +13,28 @@ from sklearn.linear_model import LinearRegression
 ticker = "PG"
 price_data = yf.download(ticker, period= "10y")
 price_data.index = pd.to_datetime(price_data.index)
+
 adj_close = price_data["Adj Close"]
+
+def stochastic_oscillator():
+    """Calculate the fast and slow Stochastic Oscillator for a given stock"""
+    
+    #Create an empty DataFrame and adding rolling highest high, lowest low and fast and slow stochastic lines
+    rolling_data = pd.DataFrame()
+
+    rolling_data["Rolling Low"] = price_data["Low"].rolling(14).min()
+    rolling_data["Rolling High"] = price_data["High"].rolling(14).max()
+    rolling_data["Stochastic Fast"] = ((price_data["Adj Close"] - rolling_data["Rolling Low"]) / 
+                                (rolling_data["Rolling High"] - rolling_data["Rolling Low"])) * 100
+    rolling_data["Stochastic Slow"] = rolling_data["Stochastic Fast"].rolling(3).mean()
+
+    stochastic = rolling_data["Stochastic Fast"][-1]
+
+    print(f"The Stochastic Oscillator for {ticker} is {stochastic:.2f}")
+
+
+
+
 
 def time_horizon_return():
     """Function to calculate the return of the stock over different time horizons"""
@@ -35,8 +57,11 @@ def time_horizon_return():
 def moving_averages():
     """Calculate the moving averge"""
     number_of_days = int(input("What number of days would you like the running average? "))
-    moving_avg = adj_close.tail(number_of_days).mean()
-    print(f"{ticker} had a {number_of_days} moving average of {moving_avg} days.")
+    sma = adj_close.tail(number_of_days).mean()
+    sme = adj_close.ewm(span= number_of_days, adjust= False).mean()
+    sme = sme.iloc[-1]
+
+    print(f"{ticker} had a {number_of_days} day simple moving average of {sma:.2f} and exponential of {sme:.2f}")
 
 def average_return():
     """Calculating average daily and daily annulised return"""
@@ -88,4 +113,36 @@ def calc_sharp_ratio(ticker):
     sharp_ratio = (capm - ten_year_yield) / stdev
     return sharp_ratio
 
-# #Future calcultaion exponential moving average, relative strentgth index, Stochastic Oscillator, Volume
+
+def rsi_calc():
+    up_day = []
+    down_day = []
+
+    adj_close = adj_close.iloc[-15:]
+    price = float(adj_close.iloc[0])
+
+    for i, x in enumerate(adj_close):
+        if i == 0:
+            continue
+        if x >= price:
+            up_day.append(x - price)
+        elif x < price:
+            down_day.append(price - x)
+        price = x
+        
+    rel_strength = np.mean(up_day) / np.mean(down_day)
+
+    rsi = 100 - (100 / (1 + rel_strength))
+
+    signal = ""
+    if rsi <= 30:
+        signal = "Oversold"
+    elif rsi <= 50:
+        signal = "Weak Momentum"
+    elif rsi <= 70:
+        signal = "Strong Momentum"
+    elif rsi <= 100:
+        signal = "Overbought"
+
+    print(f"{ticker} has an RSI of {rsi:.2f} which signals {signal}")
+    return rsi
