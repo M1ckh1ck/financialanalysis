@@ -16,6 +16,17 @@ price_data.index = pd.to_datetime(price_data.index)
 
 adj_close = price_data["Adj Close"]
 
+#Next steps calculate daily, weekly, and monthly VaR  
+# using historical, parametric and Monte Carlo 
+
+daily_return = np.log(adj_close / adj_close.shift()).dropna()
+sort_prices = np.sort(daily_return)
+
+print(sort_prices.head())
+print(sort_prices.tail())
+
+
+
 def stochastic_oscillator():
     """Calculate the fast and slow Stochastic Oscillator for a given stock"""
     
@@ -146,3 +157,8 @@ def rsi_calc():
 
     print(f"{ticker} has an RSI of {rsi:.2f} which signals {signal}")
     return rsi
+
+
+
+
+
