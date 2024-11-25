@@ -16,15 +16,44 @@ price_data.index = pd.to_datetime(price_data.index)
 
 adj_close = price_data["Adj Close"]
 
+daily_return = np.log(adj_close / adj_close.shift()).dropna()
+confidence_level = 0.95
+
 #Next steps calculate daily, weekly, and monthly VaR  
 # using historical, parametric and Monte Carlo 
 
-daily_return = np.log(adj_close / adj_close.shift()).dropna()
-sort_prices = np.sort(daily_return)
 
-print(sort_prices.head())
-print(sort_prices.tail())
+def historical_var(returns, confidence_level):
+    """Calculates the historical VaR needing the returns and confience level as inputs"""
+    h_var = np.percentile(returns, 100 * (1 - confidence_level))
+    print(
+        f"At a {confidence_level *100:.0f}% confidence level, "
+        f"{ticker} has a maximum daily loss of {h_var * 100:.2f}%"
+        )
+    return h_var
 
+
+
+def parametric_var(returns, confidence_level):
+    """Calculates the parametric VaR needing the returns and confience level as inputs"""
+    mean = np.mean(returns)
+    std = np.std(returns)
+    
+    if confidence_level == 0.90:
+        z_score = 1.645
+    elif confidence_level == 0.95:
+        z_score = 1.960
+    elif confidence_level == 0.99:
+        z_score = 2.567
+
+    p_var = mean - (z_score * std)
+    print(
+        f"At a {confidence_level *100:.0f}% confidence level, "
+        f"{ticker} has a maximum daily loss of {p_var * 100:.2f}%"
+        )
+    return p_var
+
+parametric_var(daily_return, confidence_level)
 
 
 def stochastic_oscillator():
