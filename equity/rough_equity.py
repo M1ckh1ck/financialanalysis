@@ -16,12 +16,42 @@ price_data.index = pd.to_datetime(price_data.index)
 
 adj_close = price_data["Adj Close"]
 
-daily_return = np.log(adj_close / adj_close.shift()).dropna()
+daily_returns = np.log(adj_close / adj_close.shift()).dropna()
 confidence_level = 0.95
 
 #Next steps calculate daily, weekly, and monthly VaR  
 # using historical, parametric and Monte Carlo 
 
+
+def monte_carlo(iterations, intervals):
+    #Calculate drift element using the formula and creating an array
+    mean_return = daily_returns.mean()
+    var_return = daily_returns.var()
+
+    drift = mean_return - (0.5 * var_return)
+    drift = np.array(drift)
+
+    #Calculating standard deviation creating an array
+    stdev_return = daily_returns.std()
+    stdev_return = np.array(stdev_return)
+
+    #Creating a matrix of the different possible scenarios using Geometric Brownian Motion 
+
+    r_daily_returns = np.exp(drift + stdev_return * norm.ppf(np.random.rand(intervals, iterations)))
+
+    #Creating an array full of zeros and setting the first value to the current price
+    price_list = np.zeros_like(r_daily_returns)
+    s0 = adj_close.iloc[-1]
+    price_list[0] = s0
+
+    #Looping through the different pathways 
+    for t in range (1, intervals):
+        price_list[t] = price_list[t - 1] * r_daily_returns[t]
+
+    #Plotting the 10 different simulations 
+    plt.figure(figsize= (10, 6))
+    plt.plot(price_list)
+    plt.show()
 
 def historical_var(returns, confidence_level):
     """Calculates the historical VaR needing the returns and confience level as inputs"""
@@ -53,8 +83,6 @@ def parametric_var(returns, confidence_level):
         )
     return p_var
 
-parametric_var(daily_return, confidence_level)
-
 
 def stochastic_oscillator():
     """Calculate the fast and slow Stochastic Oscillator for a given stock"""
@@ -71,8 +99,6 @@ def stochastic_oscillator():
     stochastic = rolling_data["Stochastic Fast"][-1]
 
     print(f"The Stochastic Oscillator for {ticker} is {stochastic:.2f}")
-
-
 
 
 
