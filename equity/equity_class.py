@@ -1,29 +1,40 @@
 import yfinance as yf
 import numpy as np
+import pandas as pd
 
 class Equity:
     def __init__(self, ticker):
+        """Initialising the attributes by downloading the data from Yahoo 
+        to include price data and calculate both simple log daily returns"""
+
         self.ticker = ticker
-        self.company_name = None
-        self.price_per_share = None
-        self.historical_data = None
-
-    def download_information(self):
-        """Download information about the company from Yahoo Finance"""
-        info = yf.Ticker(self.ticker).info
-
-        self.company_name = info.get('longName', 'N/A')
-        self.price_per_share = info.get('currentPrice', 0)
-        print(f"{self.company_name} has a most recent price of {self.price_per_share}")
-
-    def download_historical_data(self, period= None, start= None, end= None, interval="1d"):
-        """Download historical entering start and end date, interval set to 1 d as default"""
-
-        self.data = yf.download(self.ticker)
-        self.daily_return = (self.data("Adj Close") / self.data("Adj Close").shift()) - 1
+        self.data = yf.download(ticker, period= "5y")
+        self.data.index = pd.to_datetime(self.data.index)
+        self.adj_close = self.data["Adj Close"]
+        self.simple_daily_r = ((self.adj_close / self.adj_close.shift()) - 1).dropna()
+        self.log_daily_r = np.log(self.adj_close / self.adj_close.shift()).dropna()
+        self.avg_daily_r = self.log_daily_r.mean()
+        self.annualised_return = self.avg_daily_r * 250
         
+    def download_data(self, ticker, period= "5y"):
+        """Download price data for the given ticker"""
+        price_data = yf.download(ticker, period= period)
+        price_data.index = pd.to_datetime(price_data.index)
+        adj_close = price_data["Adj Close"]
+        return adj_close
+    
+    def calc_beta(self, benchmark= "^GSPC"):
+        """Calculate the beta of a given stock against it's benchmark"""
+        benchmark_data = self.download_data(benchmark)
+        benchmark_return = np.log(benchmark_data / benchmark_data.shift()).dropna()
+        return_data = pd.concat([self.log_daily_r, benchmark_return], axis=1)
+        return_data.columns = [self.ticker, benchmark]
+        
+        cov = np.cov(return_data[self.ticker], return_data[benchmark])[0][1]
+        market_var = np.var(return_data[benchmark])
+        beta = cov / market_var
+        return beta
 
-
+#Creating the object equity from the Equity class
 equity = Equity("PG")
-equity.download_information()
-equity.download_historical_data(period= "1y")
+print(equity.calc_beta("^GSPC"))

@@ -23,6 +23,7 @@ confidence_level = 0.95
 # using historical, parametric and Monte Carlo 
 
 
+
 def monte_carlo(iterations, intervals):
     #Calculate drift element using the formula and creating an array
     mean_return = daily_returns.mean()
@@ -150,7 +151,7 @@ def calc_beta(ticker, benchmark= "^GSPC"):
 
     daily_return = np.log(price_data / price_data.shift())
     daily_return = daily_return.dropna()
-
+    
     cov = np.cov(daily_return[ticker], daily_return[benchmark])[0][1]
     market_var = np.var(daily_return[benchmark])
     beta = cov / market_var
@@ -217,3 +218,4 @@ def rsi_calc():
 
 
 
+print(calc_beta(ticker))

@@ -1,20 +1,3 @@
-# data = pd.read_excel("python_for_finance/Housing.xlsx")
-
-# y = data["House Price"]
-# x = data[["House Size (sq.ft.)", "Number of Rooms", "Year of Construction"]]
-
-# # plt.scatter(x, y)
-# # plt.xlim(0, 2500)
-# # plt.ylim(0, 1500000)
-# # plt.ylabel('House Price')
-# # plt.xlabel('House Size (sq.ft)')
-# # plt.show()
-
-# x0 = sm.add_constant(x)
-# regression = sm.OLS(y, x0).fit()
-
-# print(regression.summary())
-
 # pg_data = yf.download("PG", start= "2007-01-01", end= "2017-03-22")
 # pg_adj_close = pg_data["Adj Close"]
 
