@@ -10,9 +10,29 @@ from sklearn.linear_model import LinearRegression
 
 
 #Create a function that gets the information from Yahoo
-ticker = "PG"
+ticker = "AMT"
+
+sector_benchmark = {
+    "Communication Services": "XLC",
+    "Consumer Cyclical": "XLY",
+    "Consumer Defensive": "XLP",
+    "Energy": "XLE",
+    "Financial Services": "XLF",
+    "Healthcare": "XLV",
+    "Industrials": "XLI",
+    "Technology": "XLK",
+    "Materials": "XLB",
+    "Real Estate": "XLRE",
+    "Utilities": "XLU",
+}
+
 price_data = yf.download(ticker, period= "10y")
 price_data.index = pd.to_datetime(price_data.index)
+
+information = yf.Ticker(ticker)
+sector = information.info.get("sector", "Sector information not available")
+
+print(f"The sector for {ticker} is: {sector} and the benchmark {sector_benchmark[sector]}")
 
 adj_close = price_data["Adj Close"]
 
@@ -214,8 +234,3 @@ def rsi_calc():
     print(f"{ticker} has an RSI of {rsi:.2f} which signals {signal}")
     return rsi
 
-
-
-
-
-print(calc_beta(ticker))
