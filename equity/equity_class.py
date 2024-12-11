@@ -59,8 +59,6 @@ class Equity:
         return benchmark
 
 
-
-
     def download_data(self, ticker, period= "5y"):
         """
         Download price data for the given ticker
@@ -130,7 +128,7 @@ class Equity:
         """Caculate the stocks Sharp Ratio using ten year treasury as risk free rate"""
         risk_free_r ,_ = self.download_data(risk_free)
         risk_free_r = (risk_free_r.iloc[-1]) / 100
-        stdev = self.log_daily_r.std() * (250 ** 0.5)
+        stdev = self.log_daily_r.std() * (252 ** 0.5)
         capm = self.calc_capm()
 
         sharpe_ratio = (capm - risk_free_r) / stdev
@@ -189,9 +187,36 @@ class Equity:
             )
         return p_var
 
+
+
+    def calc_information_ratio(self, benchmark= "^GSPC"):
+        """
+        Calculate the informatio for a given stock, ratio of active return vs 
+        benchmark and tracking error aka standard deviation of the active return
+
+        Parameters:
+        benchmark: str, default set to S&P
+
+        Return:
+        Information Ratio
+        """
+
+        asset_r = self.log_daily_r
+        _, benchmark_r = self.download_data(benchmark)
+        active_r = asset_r - benchmark_r
+        active_risk = active_r.mean() * 252
+        tracking_error = active_r.std() * (252 ** 0.5)
+
+        information_ratio = active_risk / tracking_error
+
+        print(information_ratio)
+
+
+
+
+
 #Creating the object equity from the Equity class
-equity = Equity("AMT")
+equity = Equity("PG")
 
-benchmark = equity.sector_benchmark()
 
-print(equity.calc_beta(benchmark))
+equity.calc_information_ratio()
