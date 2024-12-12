@@ -25,3 +25,4 @@ print(f" The weighted return is {weighted_portfolio_r *100:.2f}%")
 # weights = np.array([0.2, 0.2, 0.2, 0.2, 0.2])
 # weighted_portfolio_r = np.dot(annualised_portfolio, weights)
 # print(f" The weighted return is {weighted_portfolio_r *100:.2f}%")
+

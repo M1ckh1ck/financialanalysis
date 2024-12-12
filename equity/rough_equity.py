@@ -234,3 +234,4 @@ def rsi_calc():
     print(f"{ticker} has an RSI of {rsi:.2f} which signals {signal}")
     return rsi
 
+

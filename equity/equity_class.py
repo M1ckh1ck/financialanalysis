@@ -26,6 +26,7 @@ class Equity:
         self.ticker = ticker
         self.information = yf.Ticker(ticker)
         self.sector = self.information.info.get("sector")
+        self.symbol = self.information.info.get("symbol")
         self.data = yf.download(ticker, period= period)
         self.data.index = pd.to_datetime(self.data.index)
         self.adj_close = self.data["Adj Close"]
@@ -210,13 +211,3 @@ class Equity:
         information_ratio = active_risk / tracking_error
 
         print(information_ratio)
-
-
-
-
-
-#Creating the object equity from the Equity class
-equity = Equity("PG")
-
-
-equity.calc_information_ratio()

@@ -1,13 +1,15 @@
-import yfinance as yf
+from equity_class import Equity
 
-pg_data = yf.download("PG", start= "2010-01-01")
+portfolio = {}
 
-pg_data["simple_return"] = (pg_data["Adj Close"] / pg_data["Adj Close"].shift()) -1
+finished = False 
+while not finished:
+    ticker = input("""Please enter ticker symbol or "quit" to finish: """).upper()
+    if ticker == "QUIT":
+        finished = True
+    else:
+        holding = Equity(ticker)
+        symbol = holding.symbol
+        portfolio[symbol] = holding
 
-#Calculating average daily and daiy annulised return
-
-avg_daily_return = pg_data["simple_return"].mean()
-annualised_daily_return = pg_data["simple_return"].mean() * 250
-
-
-
+print(portfolio)
