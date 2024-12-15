@@ -1,20 +1,20 @@
 from equity_class import Equity
+import pandas as pd
 
+portfolio_value = 0
 portfolio = {}
 finished = False 
 
 while not finished:
     ticker = input("""Please enter ticker symbol? """).upper().strip()
-    shares = int(input("How many shares were purchased? "))
-    
+    #shares = int(input("How many shares were purchased? "))
+    date = input("""What date were the shares purchased? (YYYY/MM/DD): """)
+    date = pd.Timestamp(date) - pd.Timedelta(days=1)
+
     holding = Equity(ticker)
     symbol = holding.symbol
-    info = {
-            "equity": holding,
-            "symbol": symbol,
-            "shares": shares,
-        }
-    portfolio[symbol] = info
+
+    portfolio[symbol] = holding
 
     another = input(
             "Would you like to add another stock? (Y/N): "
@@ -23,14 +23,16 @@ while not finished:
     if another == "N":
         finished = True
 
-portfolio_value = 0
+portfolio_data = pd.DataFrame()
 
 for stock in portfolio:
-    shares = portfolio[stock]["shares"]
-    equity = portfolio[stock]["equity"]
-    price = equity.adj_close.iloc[-1]
-    portfolio_value += (shares * price)
+    equity = portfolio[stock]
+    price_data = equity.adj_close
+    price_data = price_data[date:]
+    portfolio_data = pd.concat([portfolio_data, price_data], axis=1)
 
-print(portfolio_value)
 
+
+
+print(portfolio_data)
 
