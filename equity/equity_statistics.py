@@ -8,7 +8,7 @@ finished = False
 while not finished:
     ticker = input("""Please enter ticker symbol? """).upper().strip()
     #shares = int(input("How many shares were purchased? "))
-    date = input("""What date were the shares purchased? (YYYY/MM/DD): """)
+    date = input("""What date were the shares purchased? (YYYY-MM-DD): """)
     date = pd.Timestamp(date) - pd.Timedelta(days=1)
 
     holding = Equity(ticker)
@@ -32,7 +32,4 @@ for stock in portfolio:
     portfolio_data = pd.concat([portfolio_data, price_data], axis=1)
 
 
-
-
-print(portfolio_data)
-
+ 
